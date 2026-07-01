@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Birthday Surprise</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Poppins:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            margin: 0; 
+            font-family: "Cairo","Poppins",sans-serif;
+            background: radial-gradient(circle at center, #ffe6f0 0%, #ffb6c1 100%); 
+            overflow: hidden; 
+        }
+        
+        /* Subtle polka dot background pattern to fill empty space */
+        body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(#ff5fa2 1.5px, transparent 1.5px);
+            background-size: 40px 40px;
+            opacity: 0.1;
+            z-index: 0;
+        }
+
+        #intro, #loginScreenContainer, .page { 
+            position: fixed; 
+            inset: 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            flex-direction: column; 
+            transition: 1s; 
+            z-index: 2; 
+        }
+        
+        #intro { background: linear-gradient(135deg, #ff7eb3, #ffd6e8); color: #fff; z-index: 5; }
+        #intro.hide, #loginScreenContainer.hide, .page.hide { opacity: 0; pointer-events: none; transform: scale(.95); }
+        
+        h1 { font-family: 'Pacifico', cursive; font-size: 64px; color: #ff4d95; text-shadow: 2px 2px 5px rgba(0,0,0,0.1); margin-bottom: 10px; text-align: center; }
+        h2 { color: #333; text-align: center; margin-bottom: 10px; }
+        p { text-align: center; font-size: 1.1rem; }
+
+        .card { 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(10px);
+            padding: 40px; 
+            border-radius: 25px; 
+            box-shadow: 0 15px 35px rgba(255, 77, 149, 0.2); 
+            max-width: 850px; 
+            width: 90%; 
+            max-height: 92vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto;
+        }
+        
+        button { 
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 15px 45px; 
+            border: none; 
+            border-radius: 40px; 
+            background: linear-gradient(45deg, #ff4d95, #ff7eb3); 
+            color: #fff; 
+            cursor: pointer; 
+            margin: 15px; 
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 8px 20px rgba(255, 77, 149, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(255, 77, 149, 0.6);
+        }
+        
+        input { padding: 15px; width: 100%; border-radius: 15px; margin-bottom: 15px; border: 2px solid #ffd6e8; font-size: 1.1rem; outline: none; transition: 0.3s; text-align: center;}
+        input:focus { border-color: #ff4d95; }
+        
+        .page { padding: 60px; overflow: auto; }
+        
+        #counter { 
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            background: rgba(255,255,255,.9); 
+            backdrop-filter: blur(10px); 
+            padding: 15px 25px; 
+            border-radius: 20px; 
+            z-index: 4; 
+            box-shadow: 0 5px 15px rgba(255, 77, 149, 0.2);
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .timer-title { font-family: 'Pacifico', cursive; color: #ff4d95; font-size: 1.3rem; display: block; margin-bottom: 5px; }
+
+        .heart { position: fixed; bottom: -30px; color: #ff4d95; animation: float linear infinite; z-index: 1; text-shadow: 0 0 10px rgba(255, 77, 149, 0.3); }
+        @keyframes float { to { transform: translateY(-110vh) rotate(360deg); opacity: 0; } }
+        
+        .number-21 {
+            font-family: 'Pacifico', cursive;
+            font-size: 150px;
+            margin: 0;
+            color: #ff4d95;
+            text-shadow: 4px 4px 15px rgba(255, 77, 149, 0.3);
+            line-height: 1.1;
+        }
+        .years-amazing {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #333;
+            margin-top: 10px;
+            margin-bottom: 30px;
+        }
+
+        /* Slideshow Styling */
+        .slideshow-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+            width: 100%;
+        }
+        #slideshow {
+            width: 100%;
+            max-width: 350px;
+            height: auto;
+            max-height: 50vh;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border: 5px solid #fff;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+        #slideshow:active {
+            transform: scale(0.95);
+        }
+        .tap-hint {
+            color: #888;
+            font-size: 0.95rem;
+            margin-top: 15px;
+            font-style: italic;
+        }
+        
+        .button-group { display: flex; gap: 15px; justify-content: center; width: 100%; flex-wrap: wrap; }
+
+        #letterText{ 
+    width:100%;
+    height:420px;          
+    overflow-y:auto;      
+    white-space:pre-wrap;
+
+    padding:40px;
+
+    background:#fffdf9;
+    border:2px solid #ffbfd6;
+    border-radius:18px;
+
+    font-family:"Cairo","Poppins",sans-serif;
+    font-size:1.15rem;
+    line-height:2;
+
+    direction:auto;
+    unicode-bidi:plaintext;
+    text-align:start;
+
+    box-shadow:inset 0 0 15px rgba(0,0,0,.05);
+
+    margin-bottom:25px;
+}
+        
+        #err { color: #ff0055; margin-top: 10px; font-size: 15px; font-weight: bold; }
+        .hint-text { color: #888; font-size: 0.95rem; margin-top: -5px; margin-bottom: 20px; }
+
+#letter button{
+    margin-top:20px;
+    flex-shrink:0;
+}
+    </style>
+</head>
+<body>
+
+    <div id="counter"></div>
+    
+    <div id="intro">
+        <h1>Happy Birthday my pretty princess 🎉❤️💕🎉</h1>
+        <p>A little surprise made with love...</p>
+    </div>
+    
+    <div id="loginScreenContainer" class="hide">
+        <div class="card">
+            <h2>Only for my princess 🤫💕🎉</h2>
+            <p class="hint-text">Hint: 👸🫵</p>
+            <input id="pw" type="password" placeholder="Password">
+            <button onclick="login()">Open</button>
+            <div id="err"></div>
+        </div>
+    </div>
+    
+    <div id="main" class="page hide">
+        <div class="card">
+            <h2>My baby, you just turned... 🎉</h2>
+            <div class="number-21">21!!!</div>
+            <div class="years-amazing">you grow up so fast my beautiful princessssss 🥺💕❤️</div>
+            <button onclick="show('pics')">Next</button>
+        </div>
+    </div>
+    
+    <div id="pics" class="page hide">
+        <div class="card">
+            <h2>My Gorgeous baby 💕 📸</h2>
+            
+            <div class="slideshow-container">
+                <img id="slideshow" src="images/1.jpeg" alt="Memory" onclick="nextPicture()">
+                <p class="tap-hint">(Tap the picture for the next one)</p>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="show('main')">Back</button>
+                <button onclick="show('letter')">Next</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="letter" class="page hide">
+        <div class="card">
+            <h2>A letter to my birthday baby 💌💕🎉</h2>
+            <div id="letterText" dir="auto"></div>
+            <button onclick="show('pics')">Back</button>
+        </div>
+    </div>
+
+<script>
+    // Transition from Intro to Login
+    setTimeout(() => {
+        document.getElementById('intro').classList.add('hide');
+        document.getElementById('loginScreenContainer').classList.remove('hide');
+    }, 2500);
+
+    // Login Logic
+    function login() {
+        const passwordInput = document.getElementById('pw').value.toLowerCase();
+        const errorDiv = document.getElementById('err');
+        
+        if (passwordInput === "princess riham") {
+            handleSuccessfulLogin();
+        } else {
+            errorDiv.textContent = "Wrong password. Try again!";
+        }
+    }
+
+    function handleSuccessfulLogin() {
+        document.getElementById('loginScreenContainer').classList.add('hide');
+        setTimeout(() => show('main'), 600);
+    }
+
+    // Navigation Logic
+    function show(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.add('hide'));
+        document.getElementById(id).classList.remove('hide');
+        if (id === 'letter') type();
+    }
+
+    // Slideshow Logic
+   const images = [
+    "images/1.jpeg",
+    "images/2.jpeg",
+    "images/3.jpeg",
+    "images/4.jpeg",
+    "images/5.jpeg"
+];
+    let currentImageIndex = 0;
+    
+    function nextPicture() {
+        currentImageIndex = (currentImageIndex + 1) % images.length;
+        document.getElementById('slideshow').src = images[currentImageIndex];
+    }
+
+    // Countdown Timer Logic
+    const start = new Date('2025-02-13T00:00:00');
+    setInterval(() => {
+        let d = Date.now() - start;
+        let days = Math.floor(d / 86400000);
+        let h = Math.floor((d % 86400000) / 3600000);
+        let m = Math.floor((d % 3600000) / 60000);
+        let s = Math.floor((d % 60000) / 1000);
+        document.getElementById('counter').innerHTML = `<span class="timer-title">Time together ❤️</span><b>${days}</b> days, ${h}h ${m}m ${s}s`;
+    }, 1000);
+
+    // Floating Hearts Animation
+    for (let i = 0; i < 35; i++) {
+        let e = document.createElement('div');
+        e.className = 'heart';
+        e.textContent = '❤';
+        e.style.left = Math.random() * 100 + 'vw';
+        e.style.fontSize = (15 + Math.random() * 25) + 'px';
+        e.style.animationDuration = (8 + Math.random() * 8) + 's';
+        e.style.animationDelay = Math.random() * 6 + 's';
+        document.body.appendChild(e);
+    }
+
+    // Typewriter Effect
+   const msg = `قمورتي الصغنونة كملت 21 سنةةةةةة!!!! 💕💕🎉
+
+كل سنة وانتي طيبة يا حبيبتيييييي، يا نور عيني، يا قلبي، يا روحي، يا سندي، وظهري، وفخري. 🥹💕
+بحبك وبعشقك بكل قلبي. 💕💕💕🎉🎉
+
+To my beautiful princess... 💕🥹
+
+Happy Birthdayyyy, my babyyyy!! 💕🎉
+
+I hope this year brings you endless happiness and all the success you deserve as you (and me 🤭) begin a new chapter in college. 💕🥹
+
+I know you'll continue to amaze everyone with your dedication, kindness, and hard work. I'm so proud of the incredible person you are, and every single day you inspire me more than you'll ever know, my gorgeous princess. 💕🥺
+
+Thank you for always being by my side, for supporting me, making me laugh, and filling my life with so much love and happiness. You truly make every day brighter just by being you. 🥹💕
+
+I love you more than words could ever express, and I can't wait to celebrate this special day and every milestone that comes after it with you, my one and only love 💕🥹
+
+Happy Birthdayyyy, my sweet, sweet, gorgeous princess. 💕👑
+
+I wish you nothing but endless happiness, good health, success, beautiful memories, and all the love in the world. You deserve every wonderful thing life has to offer, my beautiful queen 🥺
+
+I love you forever and always ❤️💕🎉
+
+Happy 21st Birthday, my Princess. 💕🥹🎉🎂`;
+    
+    let typed = false;
+    function type() {
+        if (typed) return;
+        typed = true;
+        let i = 0;
+        let t = document.getElementById('letterText');
+        let iv = setInterval(() => {
+            t.innerText += msg[i++] || '';
+            t.scrollTop = t.scrollHeight;
+            if (i >= msg.length) clearInterval(iv);
+        }, 35);
+    }
+</script>
+</body>
+</html>
